@@ -4,13 +4,11 @@ import com.example.springbootmongodb.model.TodoDTO;
 import com.example.springbootmongodb.repository.TodoRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class TodoController {
@@ -38,6 +36,16 @@ public class TodoController {
             return new ResponseEntity<>(todo, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/todos/{id}")
+    public ResponseEntity<?> getSingleTodo(@PathVariable String id) {
+        Optional<TodoDTO> todoOptional = todoRepo.findById(id);
+        if (todoOptional.isPresent()) {
+            return new ResponseEntity<>(todoOptional.get(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Todo with id " + id + " not found", HttpStatus.NOT_FOUND);
         }
     }
 }
