@@ -48,4 +48,30 @@ public class TodoController {
             return new ResponseEntity<>("Todo with id " + id + " not found", HttpStatus.NOT_FOUND);
         }
     }
+
+    @PutMapping("/todos/{id}")
+    public ResponseEntity<?> updateById(@PathVariable String id, @RequestBody TodoDTO todo) {
+        Optional<TodoDTO> todoOptional = todoRepo.findById(id);
+        if (todoOptional.isPresent()) {
+            TodoDTO todoToSave = todoOptional.get();
+            todoToSave.setCompleted(todo.getCompleted() != null ? todo.getCompleted() : todoToSave.getCompleted());
+            todoToSave.setTodo(todo.getTodo() != null ? todo.getTodo() : todoToSave.getTodo());
+            todoToSave.setDescription(todo.getDescription() != null ? todo.getDescription() : todoToSave.getDescription());
+            todoToSave.setUpdatedAt(new Date(System.currentTimeMillis()));
+            todoRepo.save(todoToSave);
+            return new ResponseEntity<>(todoToSave, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Todo with id " + id + " not found", HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/todos/{id}")
+    public ResponseEntity<?> deleteById(@PathVariable String id) {
+        try {
+            todoRepo.deleteById(id);
+            return new ResponseEntity<>("Todo with id " + id + " successfully deleted", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
 }
